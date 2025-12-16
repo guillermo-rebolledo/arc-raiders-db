@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Search,
   ScrollText,
@@ -308,19 +308,49 @@ function Pagination({
   )
 }
 
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
 function QuestsPage() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [questsPerPage, setQuestsPerPage] = useState(25)
 
-  // Use TanStack Query hook with pagination
+  // Debounce search input to avoid too many API calls
+  const debouncedSearch = useDebounce(searchInput, 300)
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [debouncedSearch])
+
+  // Use TanStack Query hook with pagination and server-side search
   const { data, isLoading, isError, error, refetch, isFetching } = useQuests({
     page: currentPage,
     limit: questsPerPage,
+    search: debouncedSearch || undefined,
   })
 
-  // Loading state
-  if (isLoading) {
+  // Extract data
+  const quests = data?.quests || []
+  const pagination = data?.pagination
+
+  // Loading state (only show full loading on initial load)
+  if (isLoading && !data) {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="mx-auto max-w-4xl">
@@ -359,18 +389,6 @@ function QuestsPage() {
       </div>
     )
   }
-
-  const quests = data?.quests || []
-  const pagination = data?.pagination
-
-  // Client-side filtering
-  const filteredQuests = quests.filter((quest) => {
-    return (
-      searchQuery === '' ||
-      quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      quest.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -414,11 +432,8 @@ function QuestsPage() {
             <input
               type="text"
               placeholder="Search quests..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setCurrentPage(1)
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
             />
           </div>
@@ -438,16 +453,26 @@ function QuestsPage() {
           </select>
         </div>
 
+        {/* Active search indicator */}
+        {debouncedSearch && (
+          <div className="mb-4 flex items-center gap-2 text-sm">
+            <span className="text-zinc-500">Searching for:</span>
+            <span className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-400">
+              "{debouncedSearch}"
+            </span>
+          </div>
+        )}
+
         {/* Results count */}
         <div className="mb-4 text-sm text-zinc-500">
-          Showing {filteredQuests.length} quests
+          Showing {quests.length} quests
         </div>
 
         {/* Quests list */}
-        {filteredQuests.length > 0 ? (
+        {quests.length > 0 ? (
           <>
             <div className="space-y-4">
-              {filteredQuests.map((quest) => (
+              {quests.map((quest) => (
                 <QuestCard key={quest.id} quest={quest} />
               ))}
             </div>
@@ -467,7 +492,9 @@ function QuestsPage() {
             icon="quests"
             title="No Quests Found"
             description={
-              searchQuery ? 'Try adjusting your search' : 'No quests available'
+              debouncedSearch
+                ? 'Try adjusting your search'
+                : 'No quests available'
             }
           />
         )}

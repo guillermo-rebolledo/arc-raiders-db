@@ -366,12 +366,12 @@ export interface QuestsApiResponse {
 }
 
 /**
- * Get quests with optional pagination
+ * Get quests with optional pagination and search
  */
 export async function getQuests(params?: {
   page?: string
   limit?: string
-  trader?: string
+  search?: string
 }): Promise<QuestsApiResponse> {
   const cacheKey = `quests:${JSON.stringify(params || {})}`
 

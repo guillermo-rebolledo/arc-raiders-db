@@ -2,7 +2,11 @@
  * TanStack Query hooks for ARC Raiders API
  */
 
-import { useQuery, useSuspenseQuery, useInfiniteQuery } from '@tanstack/react-query'
+import {
+  useQuery,
+  useSuspenseQuery,
+  useInfiniteQuery,
+} from '@tanstack/react-query'
 import { queryKeys } from './query-client'
 import {
   fetchItems,
@@ -11,6 +15,7 @@ import {
   fetchEventTimers,
   fetchArcs,
 } from './server-api'
+import type { Quest, PaginationInfo } from './metaforge-api'
 
 // Types for filters
 interface ItemFilters {
@@ -109,23 +114,33 @@ export function useItemsSuspense(filters: ItemFilters = {}) {
 
 // Types for quest filters
 interface QuestFilters {
-  trader?: string
+  search?: string
   page?: number
   limit?: number
 }
 
+// Return type for quests query
+interface QuestsQueryResult {
+  success: true
+  quests: Quest[]
+  pagination: PaginationInfo | null
+  fromCache: boolean
+  cachedAt?: number
+}
+
 /**
- * Hook to fetch quests with optional filters and pagination
+ * Hook to fetch quests with optional filters, search, and pagination
  */
 export function useQuests(filters: QuestFilters = {}) {
-  const { page = 1, limit = 50, ...otherFilters } = filters
+  const { page = 1, limit = 50, search, ...otherFilters } = filters
 
-  return useQuery({
-    queryKey: queryKeys.quests.list({ ...otherFilters, page, limit }),
+  return useQuery<QuestsQueryResult>({
+    queryKey: queryKeys.quests.list({ ...otherFilters, search, page, limit }),
     queryFn: async () => {
       const result = await fetchQuests({
         data: {
           ...otherFilters,
+          search: search || undefined,
           page: String(page),
           limit: String(limit),
         },
@@ -133,7 +148,7 @@ export function useQuests(filters: QuestFilters = {}) {
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch quests')
       }
-      return result
+      return result as QuestsQueryResult
     },
   })
 }
@@ -188,4 +203,3 @@ export function useArcs() {
     },
   })
 }
-

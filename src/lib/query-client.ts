@@ -36,7 +36,7 @@ export const queryKeys = {
 
   quests: {
     all: ['arc-raiders', 'quests'] as const,
-    list: (filters?: { trader?: string; page?: number; limit?: number }) =>
+    list: (filters?: { search?: string; page?: number; limit?: number }) =>
       ['arc-raiders', 'quests', 'list', filters] as const,
   },
 

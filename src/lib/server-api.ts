@@ -38,7 +38,7 @@ export const fetchItems = createServerFn({ method: 'GET' })
       search?: string
       page?: string
       limit?: string
-    }) => params
+    }) => params,
   )
   .handler(async ({ data }) => {
     try {
@@ -81,14 +81,10 @@ export const fetchArcs = createServerFn({ method: 'GET' }).handler(async () => {
   }
 })
 
-// Server function to fetch quests with pagination
+// Server function to fetch quests with pagination and search
 export const fetchQuests = createServerFn({ method: 'GET' })
   .inputValidator(
-    (params: {
-      page?: string
-      limit?: string
-      trader?: string
-    }) => params
+    (params: { page?: string; limit?: string; search?: string }) => params,
   )
   .handler(async ({ data }) => {
     try {
@@ -130,7 +126,7 @@ export const fetchTraders = createServerFn({ method: 'GET' }).handler(
         traders: [] as Trader[],
       }
     }
-  }
+  },
 )
 
 // Server function to fetch event timers (returns raw data, processing happens client-side)
@@ -153,14 +149,14 @@ export const fetchEventTimers = createServerFn({ method: 'GET' }).handler(
         events: [] as EventTimerRaw[],
       }
     }
-  }
+  },
 )
 
 // Server function to get cache stats
 export const fetchCacheStats = createServerFn({ method: 'GET' }).handler(
   async () => {
     return getCacheStats()
-  }
+  },
 )
 
 // Server function to clear cache
@@ -168,6 +164,5 @@ export const clearApiCache = createServerFn({ method: 'POST' }).handler(
   async () => {
     clearCache()
     return { success: true, message: 'Cache cleared' }
-  }
+  },
 )
-

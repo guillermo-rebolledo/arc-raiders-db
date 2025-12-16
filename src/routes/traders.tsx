@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Search,
   Coins,
-  Tag,
 } from 'lucide-react'
 import { useTraders } from '../lib/queries'
 import type { Trader, TraderItem } from '../lib/metaforge-api'
@@ -93,26 +92,20 @@ function TraderCard({ trader }: { trader: Trader }) {
   const [expanded, setExpanded] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedRarity, setSelectedRarity] = useState('')
-  const [selectedType, setSelectedType] = useState('')
 
   const inventory = trader.inventory || []
-  
-  // Get unique rarities and types
-  const rarities = [...new Set(inventory.map(i => i.rarity))].sort()
-  const types = [...new Set(inventory.map(i => i.item_type))].sort()
-  
+
+  // Get unique rarities
+  const rarities = [...new Set(inventory.map((i) => i.rarity))].sort()
+
   // Filter inventory
   const filteredInventory = inventory.filter((item) => {
-    const matchesSearch = 
+    const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesRarity = !selectedRarity || item.rarity === selectedRarity
-    const matchesType = !selectedType || item.item_type === selectedType
-    return matchesSearch && matchesRarity && matchesType
+    return matchesSearch && matchesRarity
   })
-
-  // Calculate total inventory value
-  const totalValue = inventory.reduce((sum, item) => sum + item.trader_price, 0)
 
   return (
     <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors">
@@ -133,14 +126,9 @@ function TraderCard({ trader }: { trader: Trader }) {
               >
                 {trader.name}
               </h3>
-              <div className="flex items-center gap-4 mt-2">
-                <span className="text-sm text-purple-400">
-                  {inventory.length} items
-                </span>
-                <span className="text-sm text-zinc-500">
-                  Total value: <span className="text-amber-400">{totalValue.toLocaleString()}</span>
-                </span>
-              </div>
+              <p className="text-sm text-purple-400 mt-2">
+                {inventory.length} items
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -183,21 +171,7 @@ function TraderCard({ trader }: { trader: Trader }) {
                 </option>
               ))}
             </select>
-            
-            {/* Type filter */}
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50"
-            >
-              <option value="">All Types</option>
-              {types.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            
+
             <span className="text-xs text-zinc-500 ml-auto">
               {filteredInventory.length} items
             </span>
@@ -212,7 +186,7 @@ function TraderCard({ trader }: { trader: Trader }) {
             </div>
           ) : (
             <p className="text-center text-zinc-500 py-8">
-              {searchQuery || selectedRarity || selectedType
+              {searchQuery || selectedRarity
                 ? 'No items match your filters'
                 : 'No items in inventory'}
             </p>
