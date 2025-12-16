@@ -55,7 +55,7 @@ export interface Quest {
   id: string
   name: string
   description?: string
-  trader?: string
+  objectives?: string[]
   requiredItems?: Array<{ item: Item; quantity: number }>
   rewards?: Array<{ item: Item; quantity: number }>
   xp?: number
@@ -258,7 +258,7 @@ export interface ItemsApiResponse {
 export async function getItems(params?: {
   type?: string
   rarity?: string
-  category?: string
+  item_type?: string
   search?: string
   page?: string
   limit?: string

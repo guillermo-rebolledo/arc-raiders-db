@@ -34,7 +34,7 @@ export const fetchItems = createServerFn({ method: 'GET' })
     (params: {
       type?: string
       rarity?: string
-      category?: string
+      item_type?: string
       search?: string
       page?: string
       limit?: string

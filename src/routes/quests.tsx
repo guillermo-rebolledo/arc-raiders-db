@@ -12,6 +12,7 @@ import {
   Package,
   Gift,
   Target,
+  CheckCircle2,
 } from 'lucide-react'
 import { useQuests } from '../lib/queries'
 import type { Quest, PaginationInfo } from '../lib/metaforge-api'
@@ -38,7 +39,7 @@ function QuestCard({ quest }: { quest: Quest }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+            <div className="shrink-0 w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center">
               <ScrollText className="h-6 w-6 text-emerald-400" />
             </div>
             <div>
@@ -48,11 +49,6 @@ function QuestCard({ quest }: { quest: Quest }) {
               >
                 {quest.name}
               </h3>
-              {quest.trader && (
-                <p className="text-sm text-zinc-500">
-                  From: <span className="text-emerald-400">{quest.trader}</span>
-                </p>
-              )}
               {quest.description && (
                 <p className="text-sm text-zinc-400 mt-2 line-clamp-2">
                   {quest.description}
@@ -61,7 +57,7 @@ function QuestCard({ quest }: { quest: Quest }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {quest.xp && (
+            {quest.xp != null && quest.xp > 0 && (
               <span className="text-sm text-amber-400 font-medium">
                 +{quest.xp} XP
               </span>
@@ -78,6 +74,33 @@ function QuestCard({ quest }: { quest: Quest }) {
       {/* Expanded content */}
       {expanded && (
         <div className="px-6 pb-6 pt-0 border-t border-zinc-800">
+          {/* Objectives */}
+          {quest.objectives && quest.objectives.length > 0 && (
+            <div className="mt-4">
+              <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-3">
+                <CheckCircle2 className="h-4 w-4" />
+                Objectives
+              </h4>
+              {quest.objectives.length === 1 ? (
+                <p className="text-zinc-300 text-sm pl-6">
+                  {quest.objectives[0]}
+                </p>
+              ) : (
+                <ul className="space-y-2 pl-6">
+                  {quest.objectives.map((objective, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-start gap-2 text-zinc-300 text-sm"
+                    >
+                      <span className="text-emerald-400 mt-0.5">•</span>
+                      <span>{objective}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             {/* Required items */}
             {quest.requiredItems && quest.requiredItems.length > 0 && (
@@ -87,20 +110,31 @@ function QuestCard({ quest }: { quest: Quest }) {
                   Required Items
                 </h4>
                 <div className="space-y-2">
-                  {quest.requiredItems.map((req, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg"
-                    >
-                      <Package className="h-5 w-5 text-zinc-500" />
-                      <span className="text-zinc-300">
-                        {req.item?.name || 'Unknown Item'}
-                      </span>
-                      <span className="text-sm text-zinc-500 ml-auto">
-                        x{req.quantity}
-                      </span>
-                    </div>
-                  ))}
+                  {quest.requiredItems.map((req, idx) => {
+                    const itemIcon = req.item?.icon || req.item?.image
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg"
+                      >
+                        {itemIcon ? (
+                          <img
+                            src={itemIcon}
+                            alt={req.item?.name || 'Item'}
+                            className="w-8 h-8 object-contain rounded"
+                          />
+                        ) : (
+                          <Package className="h-5 w-5 text-zinc-500" />
+                        )}
+                        <span className="text-zinc-300">
+                          {req.item?.name || 'Unknown Item'}
+                        </span>
+                        <span className="text-sm text-zinc-500 ml-auto">
+                          x{req.quantity}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -113,20 +147,31 @@ function QuestCard({ quest }: { quest: Quest }) {
                   Rewards
                 </h4>
                 <div className="space-y-2">
-                  {quest.rewards.map((reward, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                    >
-                      <Gift className="h-5 w-5 text-amber-400" />
-                      <span className="text-zinc-300">
-                        {reward.item?.name || 'Unknown Item'}
-                      </span>
-                      <span className="text-sm text-amber-400 ml-auto">
-                        x{reward.quantity}
-                      </span>
-                    </div>
-                  ))}
+                  {quest.rewards.map((reward, idx) => {
+                    const itemIcon = reward.item?.icon || reward.item?.image
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+                      >
+                        {itemIcon ? (
+                          <img
+                            src={itemIcon}
+                            alt={reward.item?.name || 'Item'}
+                            className="w-8 h-8 object-contain rounded"
+                          />
+                        ) : (
+                          <Gift className="h-5 w-5 text-amber-400" />
+                        )}
+                        <span className="text-zinc-300">
+                          {reward.item?.name || 'Unknown Item'}
+                        </span>
+                        <span className="text-sm text-amber-400 ml-auto">
+                          x{reward.quantity}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -237,7 +282,7 @@ function Pagination({
               >
                 {page}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -265,7 +310,6 @@ function Pagination({
 
 function QuestsPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTrader, setSelectedTrader] = useState<string>('')
   const [currentPage, setCurrentPage] = useState(1)
   const [questsPerPage, setQuestsPerPage] = useState(25)
 
@@ -319,20 +363,13 @@ function QuestsPage() {
   const quests = data?.quests || []
   const pagination = data?.pagination
 
-  // Get unique traders
-  const traders = [...new Set(quests.map((q) => q.trader).filter(Boolean))]
-
   // Client-side filtering
   const filteredQuests = quests.filter((quest) => {
-    const matchesSearch =
+    return (
       searchQuery === '' ||
       quest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       quest.description?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesTrader =
-      selectedTrader === '' || quest.trader === selectedTrader
-
-    return matchesSearch && matchesTrader
+    )
   })
 
   return (
@@ -386,23 +423,6 @@ function QuestsPage() {
             />
           </div>
 
-          {/* Trader filter */}
-          <select
-            value={selectedTrader}
-            onChange={(e) => {
-              setSelectedTrader(e.target.value)
-              setCurrentPage(1)
-            }}
-            className="px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 focus:outline-none focus:border-amber-500/50"
-          >
-            <option value="">All Traders</option>
-            {traders.map((trader) => (
-              <option key={trader} value={trader}>
-                {trader}
-              </option>
-            ))}
-          </select>
-
           {/* Quests per page */}
           <select
             value={questsPerPage}
@@ -447,9 +467,7 @@ function QuestsPage() {
             icon="quests"
             title="No Quests Found"
             description={
-              searchQuery || selectedTrader
-                ? 'Try adjusting your filters'
-                : 'No quests available'
+              searchQuery ? 'Try adjusting your search' : 'No quests available'
             }
           />
         )}

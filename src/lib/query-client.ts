@@ -55,4 +55,3 @@ export const queryKeys = {
     list: () => ['arc-raiders', 'arcs', 'list'] as const,
   },
 }
-

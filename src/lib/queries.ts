@@ -16,7 +16,7 @@ import {
 interface ItemFilters {
   type?: string
   rarity?: string
-  category?: string
+  item_type?: string
   search?: string
   page?: number
   limit?: number

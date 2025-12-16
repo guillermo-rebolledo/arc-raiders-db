@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Search,
   Filter,
@@ -262,7 +262,6 @@ function Pagination({
 function ItemsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [selectedRarity, setSelectedRarity] = useState<string>('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(50)
 
@@ -278,39 +277,24 @@ function ItemsPage() {
   const { data, isLoading, isError, error, refetch, isFetching } = useItems({
     page: currentPage,
     limit: itemsPerPage,
-    search: debouncedSearch || undefined, // Pass search to API
+    search: debouncedSearch || undefined,
     rarity: selectedRarity || undefined,
-    category: selectedCategory || undefined,
   })
 
-  // Extract data (must be before useMemo hooks)
+  // Extract data
   const items = data?.items || []
   const pagination = data?.pagination
 
-  // Get unique categories and rarities for filters (from current results)
-  // These hooks MUST be called before any early returns
-  const categories = useMemo(() => {
-    return [
-      ...new Set(
-        items
-          .map((item) => item.category || item.item_type || item.type)
-          .filter(Boolean)
-      ),
-    ].sort()
-  }, [items])
-
-  const rarities = useMemo(() => {
-    return [...new Set(items.map((item) => item.rarity).filter(Boolean))].sort()
-  }, [items])
+  // Fixed list of rarities (so filter options don't change based on current results)
+  const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary']
 
   // Check if any filters are active
-  const hasActiveFilters = searchInput || selectedRarity || selectedCategory
+  const hasActiveFilters = searchInput || selectedRarity
 
   // Clear all filters
   const clearFilters = () => {
     setSearchInput('')
     setSelectedRarity('')
-    setSelectedCategory('')
     setCurrentPage(1)
   }
 
@@ -446,23 +430,6 @@ function ItemsPage() {
               {rarities.map((rarity) => (
                 <option key={rarity} value={rarity}>
                   {rarity}
-                </option>
-              ))}
-            </select>
-
-            {/* Category filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value)
-                setCurrentPage(1)
-              }}
-              className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-amber-500/50"
-            >
-              <option value="">All Categories</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
                 </option>
               ))}
             </select>
