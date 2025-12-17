@@ -8,6 +8,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Layout } from '../components/Layout'
+import { UmamiAnalytics } from '../components/Analytics'
 
 import appCss from '../styles.css?url'
 
@@ -99,6 +100,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <UmamiAnalytics />
       </head>
       <body>
         {children}
