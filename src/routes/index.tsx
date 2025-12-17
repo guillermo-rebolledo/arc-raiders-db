@@ -12,7 +12,28 @@ import {
   Users,
 } from 'lucide-react'
 
-export const Route = createFileRoute('/')({ component: HomePage })
+export const Route = createFileRoute('/')({
+  component: HomePage,
+  head: () => ({
+    meta: [
+      { title: 'ARC Raiders Wiki - Your Ultimate Game Guide' },
+      {
+        name: 'description',
+        content:
+          'The ultimate community-driven wiki for ARC Raiders. Find items, quests, traders, ARCs, and live event timers. Your complete guide to surviving the ARC.',
+      },
+      {
+        property: 'og:title',
+        content: 'ARC Raiders Wiki - Your Ultimate Game Guide',
+      },
+      {
+        property: 'og:description',
+        content:
+          'The ultimate community-driven wiki for ARC Raiders. Your complete guide to surviving the ARC.',
+      },
+    ],
+  }),
+})
 
 const quickLinks = [
   {

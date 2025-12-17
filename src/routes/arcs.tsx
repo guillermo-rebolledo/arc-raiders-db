@@ -20,6 +20,22 @@ import {
 
 export const Route = createFileRoute('/arcs')({
   component: ArcsPage,
+  head: () => ({
+    meta: [
+      { title: 'ARCs & Missions - ARC Raiders Wiki' },
+      {
+        name: 'description',
+        content:
+          'Complete guide to all ARCs and missions in ARC Raiders. Find loot tables, rewards, and strategies for each mission.',
+      },
+      { property: 'og:title', content: 'ARCs & Missions - ARC Raiders Wiki' },
+      {
+        property: 'og:description',
+        content:
+          'Complete guide to all ARCs and missions in ARC Raiders with loot tables.',
+      },
+    ],
+  }),
 })
 
 // Difficulty colors

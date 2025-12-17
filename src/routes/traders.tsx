@@ -19,6 +19,22 @@ import {
 
 export const Route = createFileRoute('/traders')({
   component: TradersPage,
+  head: () => ({
+    meta: [
+      { title: 'Traders & Shops - ARC Raiders Wiki' },
+      {
+        name: 'description',
+        content:
+          'Browse all traders and their inventories in ARC Raiders. Find items for sale, prices, and rarity information.',
+      },
+      { property: 'og:title', content: 'Traders & Shops - ARC Raiders Wiki' },
+      {
+        property: 'og:description',
+        content:
+          'Browse all traders and their inventories in ARC Raiders.',
+      },
+    ],
+  }),
 })
 
 // Rarity colors

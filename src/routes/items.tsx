@@ -21,6 +21,22 @@ import {
 
 export const Route = createFileRoute('/items')({
   component: ItemsPage,
+  head: () => ({
+    meta: [
+      { title: 'Items Database - ARC Raiders Wiki' },
+      {
+        name: 'description',
+        content:
+          'Browse all items, weapons, equipment, and materials in ARC Raiders. Filter by rarity and search for specific items.',
+      },
+      { property: 'og:title', content: 'Items Database - ARC Raiders Wiki' },
+      {
+        property: 'og:description',
+        content:
+          'Browse all items, weapons, equipment, and materials in ARC Raiders.',
+      },
+    ],
+  }),
 })
 
 // Rarity colors

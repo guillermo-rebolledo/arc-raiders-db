@@ -1,13 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect, useMemo } from 'react'
-import {
-  Clock,
-  MapPin,
-  Zap,
-  Timer,
-  Calendar,
-  Filter,
-} from 'lucide-react'
+import { Clock, MapPin, Zap, Timer, Calendar, Filter } from 'lucide-react'
 import { useEventTimersRaw } from '../lib/queries'
 import type { EventTimer } from '../lib/metaforge-api'
 import {
@@ -27,11 +20,27 @@ import {
 
 export const Route = createFileRoute('/events')({
   component: EventsPage,
+  head: () => ({
+    meta: [
+      { title: 'Event Timers - ARC Raiders Wiki' },
+      {
+        name: 'description',
+        content:
+          'Live event timers for ARC Raiders. Track active and upcoming events like Harvester, Matriarch, Night Raid, and more across all maps.',
+      },
+      { property: 'og:title', content: 'Event Timers - ARC Raiders Wiki' },
+      {
+        property: 'og:description',
+        content:
+          'Live event timers for ARC Raiders. Track active and upcoming events.',
+      },
+    ],
+  }),
 })
 
 function EventCard({ event }: { event: EventTimer }) {
   const [timeRemaining, setTimeRemaining] = useState(
-    event.status === 'active' ? event.timeUntilEnd : event.timeUntilStart
+    event.status === 'active' ? event.timeUntilEnd : event.timeUntilStart,
   )
 
   // Update countdown every second
@@ -48,7 +57,7 @@ function EventCard({ event }: { event: EventTimer }) {
   }, [event])
 
   const isActive = event.status === 'active'
-  
+
   return (
     <div
       className={`relative overflow-hidden rounded-xl border p-5 transition-all hover:scale-[1.01] ${
@@ -69,9 +78,11 @@ function EventCard({ event }: { event: EventTimer }) {
 
       <div className="flex items-start gap-4">
         {/* Event icon */}
-        <div className={`flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
-          isActive ? 'ring-2 ring-emerald-500/50' : ''
-        }`}>
+        <div
+          className={`flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
+            isActive ? 'ring-2 ring-emerald-500/50' : ''
+          }`}
+        >
           {event.icon ? (
             <img
               src={event.icon}
@@ -79,9 +90,13 @@ function EventCard({ event }: { event: EventTimer }) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className={`w-full h-full flex items-center justify-center ${
-              isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
-            }`}>
+            <div
+              className={`w-full h-full flex items-center justify-center ${
+                isActive
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-zinc-800 text-zinc-500'
+              }`}
+            >
               <Zap className="h-7 w-7" />
             </div>
           )}
@@ -118,15 +133,19 @@ function EventCard({ event }: { event: EventTimer }) {
           {/* Time info */}
           <div className="flex flex-wrap items-center gap-4 text-sm">
             {/* Countdown */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium ${
-              isActive
-                ? 'bg-emerald-500/20 text-emerald-400'
-                : 'bg-amber-500/10 text-amber-400'
-            }`}>
+            <div
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium ${
+                isActive
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-amber-500/10 text-amber-400'
+              }`}
+            >
               <Timer className="h-4 w-4" />
               <span>
                 {isActive ? 'Ends in ' : 'Starts in '}
-                {timeRemaining !== undefined ? formatTimeRemaining(timeRemaining) : '--'}
+                {timeRemaining !== undefined
+                  ? formatTimeRemaining(timeRemaining)
+                  : '--'}
               </span>
             </div>
 
@@ -156,8 +175,8 @@ function EventCard({ event }: { event: EventTimer }) {
                       slot === event.currentSlot
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                         : slot === event.nextSlot
-                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        : 'bg-zinc-800/50 text-zinc-400'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-zinc-800/50 text-zinc-400'
                     }`}
                   >
                     {formatTimeSlotLocal(slot)}
@@ -173,13 +192,16 @@ function EventCard({ event }: { event: EventTimer }) {
 }
 
 function EventsPage() {
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'upcoming'>('all')
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'upcoming'
+  >('all')
   const [mapFilter, setMapFilter] = useState<string>('')
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('')
   const [, setTick] = useState(0)
 
   // Use TanStack Query hook
-  const { data, isLoading, isError, error, refetch, isFetching } = useEventTimersRaw()
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useEventTimersRaw()
 
   // Process events and calculate status (recomputed when data changes or every minute)
   const processedEvents = useMemo(() => {
@@ -190,7 +212,7 @@ function EventsPage() {
   // Re-process events every minute to update status
   useEffect(() => {
     const interval = setInterval(() => {
-      setTick(t => t + 1)
+      setTick((t) => t + 1)
     }, 60000) // Update every minute
 
     return () => clearInterval(interval)
@@ -198,13 +220,17 @@ function EventsPage() {
 
   // Get filter options
   const maps = useMemo(() => getUniqueMaps(processedEvents), [processedEvents])
-  const eventTypes = useMemo(() => getUniqueEventNames(processedEvents), [processedEvents])
+  const eventTypes = useMemo(
+    () => getUniqueEventNames(processedEvents),
+    [processedEvents],
+  )
 
   // Filter events
   const filteredEvents = useMemo(() => {
-    return processedEvents.filter(event => {
+    return processedEvents.filter((event) => {
       if (statusFilter === 'active' && event.status !== 'active') return false
-      if (statusFilter === 'upcoming' && event.status !== 'upcoming') return false
+      if (statusFilter === 'upcoming' && event.status !== 'upcoming')
+        return false
       if (mapFilter && event.map !== mapFilter) return false
       if (eventTypeFilter && event.name !== eventTypeFilter) return false
       return true
@@ -212,8 +238,12 @@ function EventsPage() {
   }, [processedEvents, statusFilter, mapFilter, eventTypeFilter])
 
   // Count by status
-  const activeCount = processedEvents.filter(e => e.status === 'active').length
-  const upcomingCount = processedEvents.filter(e => e.status === 'upcoming').length
+  const activeCount = processedEvents.filter(
+    (e) => e.status === 'active',
+  ).length
+  const upcomingCount = processedEvents.filter(
+    (e) => e.status === 'upcoming',
+  ).length
 
   // Loading state
   if (isLoading) {
@@ -238,7 +268,10 @@ function EventsPage() {
           {/* Quick stats skeleton */}
           <div className="grid grid-cols-2 gap-4 mb-8">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-zinc-800/30 border border-zinc-700/50 rounded-xl p-4 text-center">
+              <div
+                key={i}
+                className="bg-zinc-800/30 border border-zinc-700/50 rounded-xl p-4 text-center"
+              >
                 <Skeleton className="h-9 w-12 mx-auto mb-2" />
                 <Skeleton className="h-4 w-16 mx-auto" />
               </div>
@@ -288,7 +321,10 @@ function EventsPage() {
           </p>
 
           <div className="mt-2 flex items-center gap-4">
-            <CacheIndicator fromCache={data?.fromCache || false} cachedAt={data?.cachedAt} />
+            <CacheIndicator
+              fromCache={data?.fromCache || false}
+              cachedAt={data?.cachedAt}
+            />
             <span className="text-xs text-zinc-600">
               Times shown in your local timezone
             </span>
@@ -298,7 +334,9 @@ function EventsPage() {
         {/* Quick stats */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <button
-            onClick={() => setStatusFilter(statusFilter === 'active' ? 'all' : 'active')}
+            onClick={() =>
+              setStatusFilter(statusFilter === 'active' ? 'all' : 'active')
+            }
             className={`rounded-xl p-4 text-center transition-all ${
               statusFilter === 'active'
                 ? 'bg-emerald-500/20 border-2 border-emerald-500/50 ring-2 ring-emerald-500/20'
@@ -316,9 +354,11 @@ function EventsPage() {
             </div>
             <div className="text-sm text-zinc-400">Active Now</div>
           </button>
-          
+
           <button
-            onClick={() => setStatusFilter(statusFilter === 'upcoming' ? 'all' : 'upcoming')}
+            onClick={() =>
+              setStatusFilter(statusFilter === 'upcoming' ? 'all' : 'upcoming')
+            }
             className={`rounded-xl p-4 text-center transition-all ${
               statusFilter === 'upcoming'
                 ? 'bg-amber-500/20 border-2 border-amber-500/50 ring-2 ring-amber-500/20'
@@ -341,7 +381,7 @@ function EventsPage() {
             <Filter className="h-4 w-4" />
             <span className="text-sm">Filters:</span>
           </div>
-          
+
           {/* Map filter */}
           <select
             value={mapFilter}
@@ -411,8 +451,9 @@ function EventsPage() {
         {/* Timezone info */}
         <div className="mt-8 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
           <p className="text-sm text-zinc-500">
-            <strong className="text-zinc-400">About event times:</strong> All event times from the API are in UTC 
-            and have been converted to your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone}). 
+            <strong className="text-zinc-400">About event times:</strong> All
+            event times from the API are in UTC and have been converted to your
+            local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone}).
             Events repeat daily at the scheduled times.
           </p>
         </div>
