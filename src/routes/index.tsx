@@ -141,15 +141,24 @@ function HomePage() {
 
             {/* Title */}
             <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-6">
-              <span className="block text-zinc-100" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+              <span
+                className="block text-zinc-100"
+                style={{ fontFamily: 'Orbitron, sans-serif' }}
+              >
                 ARC RAIDERS
               </span>
-              <span className="block text-amber-500" style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 }}>
+              <span
+                className="block text-amber-500"
+                style={{ fontFamily: 'Rajdhani, sans-serif', fontWeight: 600 }}
+              >
                 DATABASE
               </span>
             </h1>
 
-            <p className="max-w-2xl mx-auto text-lg sm:text-xl text-zinc-400 mb-12" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+            <p
+              className="max-w-2xl mx-auto text-lg sm:text-xl text-zinc-400 mb-12"
+              style={{ fontFamily: 'Rajdhani, sans-serif' }}
+            >
               Your ultimate resource for ARC Raiders. Browse items, track
               quests, check trader inventories, and never miss an event.
             </p>
@@ -180,7 +189,10 @@ function HomePage() {
       {/* Quick Links Section */}
       <section className="relative py-16 px-4">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-2xl font-bold text-zinc-100 mb-8" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+          <h2
+            className="text-2xl font-bold text-zinc-100 mb-8"
+            style={{ fontFamily: 'Rajdhani, sans-serif' }}
+          >
             Quick Access
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -190,7 +202,7 @@ function HomePage() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${link.color} border ${link.borderColor} p-6 transition-all hover:scale-[1.02] hover:shadow-xl`}
+                  className={`group relative overflow-hidden rounded-xl bg-linear-to-br ${link.color} border ${link.borderColor} p-6 transition-all hover:scale-[1.02] hover:shadow-xl`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -199,10 +211,15 @@ function HomePage() {
                       >
                         <Icon className="h-6 w-6" />
                       </div>
-                      <h3 className="text-lg font-bold text-zinc-100 mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                      <h3
+                        className="text-lg font-bold text-zinc-100 mb-2"
+                        style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                      >
                         {link.label}
                       </h3>
-                      <p className="text-sm text-zinc-400">{link.description}</p>
+                      <p className="text-sm text-zinc-400">
+                        {link.description}
+                      </p>
                     </div>
                     <ChevronRight className="h-5 w-5 text-zinc-500 group-hover:text-zinc-300 group-hover:translate-x-1 transition-all" />
                   </div>
@@ -210,60 +227,6 @@ function HomePage() {
               )
             })}
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-zinc-900/50">
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-zinc-100 mb-4" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-              Why Use This Wiki?
-            </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
-              Built with performance and usability in mind, our wiki provides
-              fast access to all the game data you need.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <div
-                  key={index}
-                  className="text-center p-6 rounded-xl bg-zinc-800/30 border border-zinc-700/50"
-                >
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-amber-500/10 text-amber-500 mb-4">
-                    <Icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-lg font-bold text-zinc-100 mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-zinc-400">{feature.description}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Data Attribution */}
-      <section className="py-12 px-4">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-zinc-500 text-sm">
-            All game data is sourced from the{' '}
-            <a
-              href="https://metaforge.app/arc-raiders"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-amber-500 hover:text-amber-400 transition-colors"
-            >
-              MetaForge API
-            </a>
-            , maintained by the community. Data is cached locally to ensure
-            fast load times and respect API rate limits.
-          </p>
         </div>
       </section>
     </div>

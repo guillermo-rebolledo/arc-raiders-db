@@ -134,23 +134,45 @@ export function Layout() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-zinc-500 text-sm">
               <Zap className="h-4 w-4 text-amber-500/50" />
-              <span>ARC Raiders Community Wiki</span>
-            </div>
-            <div className="text-zinc-600 text-xs text-center md:text-right">
-              <p>
-                Data provided by{' '}
+              <p className="text-zinc-500 text-sm">
+                Made by{' '}
+                <a
+                  href="https://memorebo.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-500 hover:text-amber-400 transition-colors"
+                >
+                  @memo
+                </a>{' '}
+                All game data is sourced from the{' '}
                 <a
                   href="https://metaforge.app/arc-raiders"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-500/70 hover:text-amber-500 transition-colors"
+                  className="text-amber-500 hover:text-amber-400 transition-colors"
                 >
-                  MetaForge
+                  MetaForge API
                 </a>
-              </p>
-              <p className="mt-1">
-                ARC Raiders is a trademark of Embark Studios. This site is not
-                affiliated with Embark Studios.
+                , maintained by the community. As well as{' '}
+                <a
+                  href="https://github.com/wangyz1999"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-500 hover:text-amber-400 transition-colors"
+                >
+                  @wangyz1999
+                </a>
+                's{' '}
+                <a
+                  href="https://github.com/wangyz1999/arcforge"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-500 hover:text-amber-400 transition-colors"
+                >
+                  arcforge
+                </a>{' '}
+                GitHub repository. ARC Raiders is a trademark of Embark Studios.
+                This site is not affiliated with Embark Studios.
               </p>
             </div>
           </div>
@@ -159,4 +181,3 @@ export function Layout() {
     </div>
   )
 }
-
