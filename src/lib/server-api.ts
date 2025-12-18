@@ -1,21 +1,24 @@
 /**
  * Server functions for ARC Raiders API
- * These wrap the MetaForge API with caching
+ * Data sourced from wiki JSON for items and traders
+ * Quests, ARCs, and event timers use MetaForge API
  */
 
 import { createServerFn } from '@tanstack/react-start'
 import {
   getItems,
-  getArcs,
-  getQuests,
   getTraders,
-  getEventTimers,
   getCacheStats,
   clearCache,
   type Item,
+  type Trader,
+} from './wiki-api'
+import {
+  getArcs,
+  getQuests,
+  getEventTimers,
   type Arc,
   type Quest,
-  type Trader,
   type EventTimerRaw,
   type PaginationInfo,
 } from './metaforge-api'
@@ -28,25 +31,67 @@ function ensureArray<T>(data: unknown): T[] {
   return []
 }
 
-// Server function to fetch items with pagination
+/**
+ * Extract rarity from item - rarity is in infobox.rarity
+ */
+function getItemRarity(item: Item): string | undefined {
+  return item.infobox?.rarity
+}
+
+// Server function to fetch items (with client-side filtering/pagination)
 export const fetchItems = createServerFn({ method: 'GET' })
   .inputValidator(
     (params: {
-      type?: string
-      rarity?: string
-      item_type?: string
       search?: string
+      rarity?: string
       page?: string
       limit?: string
     }) => params,
   )
   .handler(async ({ data }) => {
     try {
-      const result = await getItems(data)
+      const result = await getItems()
+      let items = ensureArray<Item>(result.data)
+
+      // Apply search filter
+      if (data.search) {
+        const searchLower = data.search.toLowerCase()
+        items = items.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchLower) ||
+            item.infobox?.quote?.toLowerCase().includes(searchLower) ||
+            item.infobox?.type?.toLowerCase().includes(searchLower),
+        )
+      }
+
+      // Apply rarity filter
+      if (data.rarity) {
+        const rarityLower = data.rarity.toLowerCase()
+        items = items.filter((item) => {
+          const itemRarity = getItemRarity(item)
+          return itemRarity?.toLowerCase() === rarityLower
+        })
+      }
+
+      // Calculate pagination
+      const page = parseInt(data.page || '1', 10)
+      const limit = parseInt(data.limit || '50', 10)
+      const total = items.length
+      const totalPages = Math.ceil(total / limit)
+      const startIndex = (page - 1) * limit
+      const paginatedItems = items.slice(startIndex, startIndex + limit)
+
       return {
         success: true as const,
-        items: ensureArray<Item>(result.items),
-        pagination: result.pagination,
+        items: paginatedItems,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        },
         fromCache: result.fromCache,
         cachedAt: result.cachedAt,
       }
@@ -56,7 +101,7 @@ export const fetchItems = createServerFn({ method: 'GET' })
         success: false as const,
         error: error instanceof Error ? error.message : 'Unknown error',
         items: [] as Item[],
-        pagination: null as PaginationInfo | null,
+        pagination: null,
       }
     }
   })
@@ -64,7 +109,7 @@ export const fetchItems = createServerFn({ method: 'GET' })
 // Server function to fetch ARCs
 export const fetchArcs = createServerFn({ method: 'GET' }).handler(async () => {
   try {
-    const result = await getArcs({ includeLoot: 'true' })
+    const result = await getArcs()
     return {
       success: true as const,
       arcs: ensureArray<Arc>(result.data),
@@ -81,7 +126,7 @@ export const fetchArcs = createServerFn({ method: 'GET' }).handler(async () => {
   }
 })
 
-// Server function to fetch quests with pagination and search
+// Server function to fetch quests (uses MetaForge API with pagination/search)
 export const fetchQuests = createServerFn({ method: 'GET' })
   .inputValidator(
     (params: { page?: string; limit?: string; search?: string }) => params,
@@ -129,12 +174,11 @@ export const fetchTraders = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-// Server function to fetch event timers (returns raw data, processing happens client-side)
+// Server function to fetch event timers (still from MetaForge - real-time data)
 export const fetchEventTimers = createServerFn({ method: 'GET' }).handler(
   async () => {
     try {
       const result = await getEventTimers()
-      // Return raw events - processing is done client-side to calculate real-time status
       return {
         success: true as const,
         events: ensureArray<EventTimerRaw>(result.data),

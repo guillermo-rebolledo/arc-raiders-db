@@ -22,7 +22,6 @@ export interface Item {
   category?: string
   item_type?: string
   components?: Item[]
-  [key: string]: unknown
 }
 
 // Pagination info from API
@@ -47,8 +46,8 @@ export interface Arc {
   description?: string
   location?: string
   difficulty?: string
-  loot?: Item[]
-  [key: string]: unknown
+  icon?: string
+  image?: string
 }
 
 export interface Quest {
@@ -59,7 +58,6 @@ export interface Quest {
   requiredItems?: Array<{ item: Item; quantity: number }>
   rewards?: Array<{ item: Item; quantity: number }>
   xp?: number
-  [key: string]: unknown
 }
 
 // Individual item sold by a trader

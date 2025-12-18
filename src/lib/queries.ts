@@ -15,7 +15,17 @@ import {
   fetchEventTimers,
   fetchArcs,
 } from './server-api'
-import type { Quest, PaginationInfo } from './metaforge-api'
+import type { Quest, PaginationInfo as MetaforgePaginationInfo } from './metaforge-api'
+
+// Pagination info type
+interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
 
 // Types for filters
 interface ItemFilters {

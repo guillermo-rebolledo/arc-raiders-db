@@ -87,6 +87,8 @@ function EventCard({ event }: { event: EventTimer }) {
             <img
               src={event.icon}
               alt={event.name}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
           ) : (

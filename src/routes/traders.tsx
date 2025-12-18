@@ -7,9 +7,10 @@ import {
   ChevronUp,
   Search,
   Coins,
+  Lock,
 } from 'lucide-react'
 import { useTraders } from '../lib/queries'
-import type { Trader, TraderItem } from '../lib/metaforge-api'
+import type { Trader, ShopItem } from '../lib/wiki-api'
 import {
   ErrorDisplay,
   TradersListSkeleton,
@@ -25,80 +26,55 @@ export const Route = createFileRoute('/traders')({
       {
         name: 'description',
         content:
-          'Browse all traders and their inventories in ARC Raiders. Find items for sale, prices, and rarity information.',
+          'Browse all traders and their inventories in ARC Raiders. Find items for sale, prices, and stock information.',
       },
       { property: 'og:title', content: 'Traders & Shops - ARC Raiders Wiki' },
       {
         property: 'og:description',
-        content:
-          'Browse all traders and their inventories in ARC Raiders.',
+        content: 'Browse all traders and their inventories in ARC Raiders.',
       },
     ],
   }),
 })
 
-// Rarity colors
-const rarityColors: Record<string, string> = {
-  common: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
-  uncommon: 'bg-green-500/20 text-green-300 border-green-500/30',
-  rare: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  epic: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  legendary: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+// Currency colors
+const currencyColors: Record<string, string> = {
+  cred: 'text-green-400',
+  coins: 'text-amber-400',
+  'assorted seeds': 'text-emerald-400',
+  augment: 'text-purple-400',
 }
 
-function InventoryItem({ item }: { item: TraderItem }) {
-  const rarity = (item.rarity || 'common').toLowerCase()
-  const rarityStyle = rarityColors[rarity] || rarityColors.common
+function ShopItemCard({ item }: { item: ShopItem }) {
+  const currencyLower = item.currency.toLowerCase()
+  const currencyColor = currencyColors[currencyLower] || 'text-zinc-300'
 
   return (
-    <div className="flex items-start gap-3 p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors group">
-      {/* Item icon */}
-      <div className="w-12 h-12 rounded-lg bg-zinc-700/50 flex items-center justify-center overflow-hidden flex-shrink-0">
-        {item.icon ? (
-          <img
-            src={item.icon}
-            alt={item.name}
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <Package className="h-6 w-6 text-zinc-500" />
-        )}
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-zinc-100 font-medium group-hover:text-white transition-colors">
-              {item.name}
-            </p>
-            <div className="flex items-center gap-2 mt-1">
-              <span
-                className={`text-xs font-medium px-1.5 py-0.5 rounded border ${rarityStyle}`}
-              >
-                {item.rarity}
-              </span>
-              <span className="text-xs text-zinc-500">{item.item_type}</span>
-            </div>
-          </div>
-          
-          {/* Price */}
-          <div className="text-right flex-shrink-0">
-            <div className="flex items-center gap-1 text-amber-400 font-bold">
-              <Coins className="h-4 w-4" />
-              <span>{item.trader_price.toLocaleString()}</span>
-            </div>
-            <div className="text-xs text-zinc-500">
-              Value: {item.value.toLocaleString()}
-            </div>
-          </div>
+    <div className="flex items-center justify-between gap-3 p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors group">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="w-10 h-10 rounded-lg bg-zinc-700/50 flex items-center justify-center flex-shrink-0">
+          <Package className="h-5 w-5 text-zinc-500" />
         </div>
-        
-        {/* Description */}
-        {item.description && (
-          <p className="text-xs text-zinc-400 mt-2 line-clamp-2">
-            {item.description}
+        <div className="min-w-0">
+          <p className="text-zinc-100 font-medium group-hover:text-white transition-colors truncate">
+            {item.name}
           </p>
-        )}
+          {item.is_limited && item.stock && (
+            <div className="flex items-center gap-1 text-xs text-amber-400 mt-0.5">
+              <Lock className="h-3 w-3" />
+              <span>Stock: {item.stock}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Price */}
+      <div className="text-right flex-shrink-0">
+        <div className={`flex items-center gap-1 font-bold ${currencyColor}`}>
+          <Coins className="h-4 w-4" />
+          <span>{item.price.toLocaleString()}</span>
+        </div>
+        <div className="text-xs text-zinc-500">{item.currency}</div>
       </div>
     </div>
   )
@@ -107,21 +83,21 @@ function InventoryItem({ item }: { item: TraderItem }) {
 function TraderCard({ trader }: { trader: Trader }) {
   const [expanded, setExpanded] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedRarity, setSelectedRarity] = useState('')
+  const [showLimitedOnly, setShowLimitedOnly] = useState(false)
 
-  const inventory = trader.inventory || []
+  const shop = trader.shop || []
 
-  // Get unique rarities
-  const rarities = [...new Set(inventory.map((i) => i.rarity))].sort()
-
-  // Filter inventory
-  const filteredInventory = inventory.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesRarity = !selectedRarity || item.rarity === selectedRarity
-    return matchesSearch && matchesRarity
+  // Filter shop items
+  const filteredShop = shop.filter((item) => {
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+    const matchesLimited = !showLimitedOnly || item.is_limited
+    return matchesSearch && matchesLimited
   })
+
+  // Count limited items
+  const limitedCount = shop.filter((i) => i.is_limited).length
 
   return (
     <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden hover:border-purple-500/30 transition-colors">
@@ -132,8 +108,21 @@ function TraderCard({ trader }: { trader: Trader }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <Store className="h-8 w-8 text-purple-400" />
+            {/* Trader image */}
+            <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-purple-500/10">
+              {trader.image_urls?.original ? (
+                <img
+                  src={trader.image_urls.original}
+                  alt={trader.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Store className="h-8 w-8 text-purple-400" />
+                </div>
+              )}
             </div>
             <div>
               <h3
@@ -142,9 +131,14 @@ function TraderCard({ trader }: { trader: Trader }) {
               >
                 {trader.name}
               </h3>
-              <p className="text-sm text-purple-400 mt-2">
-                {inventory.length} items
-              </p>
+              <div className="flex items-center gap-3 mt-2 text-sm">
+                <span className="text-purple-400">{shop.length} items</span>
+                {limitedCount > 0 && (
+                  <span className="text-amber-400">
+                    {limitedCount} limited stock
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -157,7 +151,7 @@ function TraderCard({ trader }: { trader: Trader }) {
         </div>
       </button>
 
-      {/* Expanded content - Inventory */}
+      {/* Expanded content - Shop */}
       {expanded && (
         <div className="px-6 pb-6 pt-0 border-t border-zinc-800">
           {/* Filters */}
@@ -173,39 +167,52 @@ function TraderCard({ trader }: { trader: Trader }) {
                 className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-purple-500/50"
               />
             </div>
-            
-            {/* Rarity filter */}
-            <select
-              value={selectedRarity}
-              onChange={(e) => setSelectedRarity(e.target.value)}
-              className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50"
-            >
-              <option value="">All Rarities</option>
-              {rarities.map((rarity) => (
-                <option key={rarity} value={rarity}>
-                  {rarity}
-                </option>
-              ))}
-            </select>
+
+            {/* Limited only toggle */}
+            {limitedCount > 0 && (
+              <button
+                onClick={() => setShowLimitedOnly(!showLimitedOnly)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  showLimitedOnly
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'
+                }`}
+              >
+                <Lock className="h-3.5 w-3.5" />
+                Limited Only
+              </button>
+            )}
 
             <span className="text-xs text-zinc-500 ml-auto">
-              {filteredInventory.length} items
+              {filteredShop.length} items
             </span>
           </div>
 
-          {/* Inventory grid */}
-          {filteredInventory.length > 0 ? (
+          {/* Shop grid */}
+          {filteredShop.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-h-[600px] overflow-y-auto pr-2">
-              {filteredInventory.map((item) => (
-                <InventoryItem key={item.id} item={item} />
+              {filteredShop.map((item, index) => (
+                <ShopItemCard key={`${item.name}-${index}`} item={item} />
               ))}
             </div>
           ) : (
             <p className="text-center text-zinc-500 py-8">
-              {searchQuery || selectedRarity
+              {searchQuery || showLimitedOnly
                 ? 'No items match your filters'
-                : 'No items in inventory'}
+                : 'No items in shop'}
             </p>
+          )}
+
+          {/* Wiki link */}
+          {trader.wiki_url && (
+            <a
+              href={trader.wiki_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-4 text-sm text-purple-400 hover:text-purple-300 hover:underline"
+            >
+              View on Wiki →
+            </a>
           )}
         </div>
       )}
@@ -266,9 +273,9 @@ function TradersPage() {
   const filteredTraders = traders.filter((trader) =>
     trader.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
-  
+
   // Calculate totals
-  const totalItems = traders.reduce((sum, t) => sum + t.inventory.length, 0)
+  const totalItems = traders.reduce((sum, t) => sum + (t.shop?.length || 0), 0)
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -292,7 +299,10 @@ function TradersPage() {
           </p>
 
           <div className="mt-2 flex items-center gap-4">
-            <CacheIndicator fromCache={data?.fromCache || false} cachedAt={data?.cachedAt} />
+            <CacheIndicator
+              fromCache={data?.fromCache || false}
+              cachedAt={data?.cachedAt}
+            />
             <span className="text-xs text-zinc-500">
               {traders.length} traders • {totalItems} total items
             </span>
@@ -314,8 +324,8 @@ function TradersPage() {
         {/* Traders list */}
         {filteredTraders.length > 0 ? (
           <div className="space-y-4">
-            {filteredTraders.map((trader) => (
-              <TraderCard key={trader.id} trader={trader} />
+            {filteredTraders.map((trader, index) => (
+              <TraderCard key={`${trader.name}-${index}`} trader={trader} />
             ))}
           </div>
         ) : (

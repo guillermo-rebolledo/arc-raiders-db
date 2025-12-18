@@ -9,13 +9,21 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Package,
   Gift,
-  Target,
   CheckCircle2,
 } from 'lucide-react'
 import { useQuests } from '../lib/queries'
-import type { Quest, PaginationInfo } from '../lib/metaforge-api'
+import type { Quest } from '../lib/metaforge-api'
+
+// Pagination info type
+interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
 import {
   ErrorDisplay,
   QuestsListSkeleton,
@@ -97,106 +105,100 @@ function QuestCard({ quest }: { quest: Quest }) {
                 <CheckCircle2 className="h-4 w-4" />
                 Objectives
               </h4>
-              {quest.objectives.length === 1 ? (
-                <p className="text-zinc-300 text-sm pl-6">
-                  {quest.objectives[0]}
-                </p>
-              ) : (
-                <ul className="space-y-2 pl-6">
-                  {quest.objectives.map((objective, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-start gap-2 text-zinc-300 text-sm"
-                    >
-                      <span className="text-emerald-400 mt-0.5">•</span>
-                      <span>{objective}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <ul className="space-y-2 pl-6">
+                {quest.objectives.map((objective, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2 text-zinc-300 text-sm"
+                  >
+                    <span className="text-emerald-400 mt-0.5">•</span>
+                    <span>{objective}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            {/* Required items */}
-            {quest.requiredItems && quest.requiredItems.length > 0 && (
-              <div>
-                <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-3">
-                  <Target className="h-4 w-4" />
-                  Required Items
-                </h4>
-                <div className="space-y-2">
-                  {quest.requiredItems.map((req, idx) => {
-                    const itemIcon = req.item?.icon || req.item?.image
-                    return (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg"
-                      >
-                        {itemIcon ? (
-                          <img
-                            src={itemIcon}
-                            alt={req.item?.name || 'Item'}
-                            className="w-8 h-8 object-contain rounded"
-                          />
-                        ) : (
-                          <Package className="h-5 w-5 text-zinc-500" />
-                        )}
-                        <span className="text-zinc-300">
-                          {req.item?.name || 'Unknown Item'}
-                        </span>
-                        <span className="text-sm text-zinc-500 ml-auto">
-                          x{req.quantity}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
+          {/* Rewards */}
+          {quest.rewards && quest.rewards.length > 0 && (
+            <div className="mt-4">
+              <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-3">
+                <Gift className="h-4 w-4" />
+                Rewards
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {quest.rewards.map((reward, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+                  >
+                    {reward.item?.icon ? (
+                      <img
+                        src={reward.item.icon}
+                        alt={reward.item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-5 h-5 object-contain"
+                      />
+                    ) : (
+                      <Gift className="h-4 w-4 text-amber-400" />
+                    )}
+                    <span className="text-zinc-300 text-sm">
+                      {reward.item?.name || 'Unknown Item'}
+                    </span>
+                    {reward.quantity > 1 && (
+                      <span className="text-xs text-amber-400">
+                        x{reward.quantity}
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-
-            {/* Rewards */}
-            {quest.rewards && quest.rewards.length > 0 && (
-              <div>
-                <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-3">
-                  <Gift className="h-4 w-4" />
-                  Rewards
-                </h4>
-                <div className="space-y-2">
-                  {quest.rewards.map((reward, idx) => {
-                    const itemIcon = reward.item?.icon || reward.item?.image
-                    return (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
-                      >
-                        {itemIcon ? (
-                          <img
-                            src={itemIcon}
-                            alt={reward.item?.name || 'Item'}
-                            className="w-8 h-8 object-contain rounded"
-                          />
-                        ) : (
-                          <Gift className="h-5 w-5 text-amber-400" />
-                        )}
-                        <span className="text-zinc-300">
-                          {reward.item?.name || 'Unknown Item'}
-                        </span>
-                        <span className="text-sm text-amber-400 ml-auto">
-                          x{reward.quantity}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Full description */}
           {quest.description && (
             <div className="mt-4 p-4 bg-zinc-800/30 rounded-lg">
               <p className="text-zinc-400 text-sm">{quest.description}</p>
+            </div>
+          )}
+
+          {/* Required Items */}
+          {quest.requiredItems && quest.requiredItems.length > 0 && (
+            <div className="mt-4">
+              <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-3">
+                <CheckCircle2 className="h-4 w-4" />
+                Required Items
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {quest.requiredItems.map((req, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 px-3 py-2 bg-zinc-800/50 border border-zinc-700 rounded-lg"
+                  >
+                    {req.item?.icon ? (
+                      <img
+                        src={req.item.icon}
+                        alt={req.item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-5 h-5 object-contain"
+                      />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-zinc-500" />
+                    )}
+                    <span className="text-zinc-300 text-sm">
+                      {req.item?.name || 'Unknown Item'}
+                    </span>
+                    {req.quantity > 1 && (
+                      <span className="text-xs text-zinc-500">
+                        x{req.quantity}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -488,8 +490,8 @@ function QuestsPage() {
         {quests.length > 0 ? (
           <>
             <div className="space-y-4">
-              {quests.map((quest) => (
-                <QuestCard key={quest.id} quest={quest} />
+              {quests.map((quest, idx) => (
+                <QuestCard key={`${quest.name}-${idx}`} quest={quest} />
               ))}
             </div>
 

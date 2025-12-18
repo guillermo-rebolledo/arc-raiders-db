@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
   Search,
@@ -11,7 +11,17 @@ import {
   X,
 } from 'lucide-react'
 import { useItems } from '../lib/queries'
-import type { Item, PaginationInfo } from '../lib/metaforge-api'
+import type { Item } from '../lib/wiki-api'
+
+// Pagination info type
+interface PaginationInfo {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+}
 import {
   ErrorDisplay,
   ItemsGridSkeleton,
@@ -46,6 +56,7 @@ const rarityColors: Record<string, string> = {
   rare: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
   epic: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
   legendary: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  exotic: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
 }
 
 // Category icons/colors
@@ -75,22 +86,23 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
+// Helper to extract rarity from item - rarity is in infobox.rarity
+function getItemRarity(item: Item): string {
+  return item.infobox?.rarity || 'Common'
+}
+
 function ItemCard({ item }: { item: Item }) {
-  const rarity = (item.rarity || 'common').toLowerCase()
-  const category = (
-    item.category ||
-    item.item_type ||
-    item.type ||
-    'default'
-  ).toLowerCase()
+  const rarity = getItemRarity(item).toLowerCase()
+  const category = (item.infobox?.type || 'default').toLowerCase()
   const categoryStyle = categoryStyles[category] || categoryStyles.default
   const rarityStyle = rarityColors[rarity] || rarityColors.common
-  const itemIcon = item.icon || item.image
+  const itemIcon = item.image_urls?.thumb || item.image_urls?.original
 
   return (
-    <Link
-      to="/items/$itemId"
-      params={{ itemId: item.id }}
+    <a
+      href={item.wiki_url || '#'}
+      target="_blank"
+      rel="noopener noreferrer"
       className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${categoryStyle} border p-4 transition-all hover:scale-[1.02] hover:shadow-lg`}
     >
       <div className="flex items-start gap-4">
@@ -100,6 +112,8 @@ function ItemCard({ item }: { item: Item }) {
             <img
               src={itemIcon}
               alt={item.name}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-contain"
             />
           ) : (
@@ -126,23 +140,20 @@ function ItemCard({ item }: { item: Item }) {
           </span>
 
           {/* Description preview */}
-          {item.description && (
-            <p className="text-xs text-zinc-400 mt-2 line-clamp-2">
-              {item.description}
+          {item.infobox?.quote && (
+            <p className="text-xs text-zinc-400 mt-2 line-clamp-2 italic">
+              {item.infobox.quote}
             </p>
           )}
 
           {/* Meta info */}
           <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
-            {(item.item_type || item.type) && (
-              <span>{item.item_type || item.type}</span>
-            )}
-            {item.weight && <span>{item.weight}kg</span>}
-            {item.value && <span>{item.value}₽</span>}
+            {item.infobox?.type && <span>{item.infobox.type}</span>}
+            {item.infobox?.weight && <span>{item.infobox.weight}kg</span>}
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   )
 }
 
@@ -301,8 +312,15 @@ function ItemsPage() {
   const items = data?.items || []
   const pagination = data?.pagination
 
-  // Fixed list of rarities (so filter options don't change based on current results)
-  const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary']
+  // Static list of known rarities in ARC Raiders
+  const rarities = [
+    'Common',
+    'Uncommon',
+    'Rare',
+    'Epic',
+    'Legendary',
+    'Exotic',
+  ]
 
   // Check if any filters are active
   const hasActiveFilters = searchInput || selectedRarity
