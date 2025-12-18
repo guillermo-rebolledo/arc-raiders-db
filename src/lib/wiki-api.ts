@@ -85,7 +85,7 @@ export interface ApiResponse<T> {
 async function fetchWithCache<T>(
   endpoint: string,
   cacheKey: string,
-  ttl: number
+  ttl: number,
 ): Promise<ApiResponse<T>> {
   // Check cache first
   const cached = cache.get<{ data: T; cachedAt: number }>(cacheKey)
@@ -130,7 +130,7 @@ export async function getItems(): Promise<ApiResponse<Item[]>> {
   return fetchWithCache<Item[]>(
     'items_database.json',
     'wiki:items',
-    CACHE_TTL.ITEMS
+    CACHE_TTL.ITEMS,
   )
 }
 
@@ -141,7 +141,7 @@ export async function getTraders(): Promise<ApiResponse<Trader[]>> {
   return fetchWithCache<Trader[]>(
     'traders_database.json',
     'wiki:traders',
-    CACHE_TTL.TRADERS
+    CACHE_TTL.TRADERS,
   )
 }
 
@@ -157,4 +157,3 @@ export function getCacheStats() {
 export function clearCache() {
   cache.clear()
 }
-

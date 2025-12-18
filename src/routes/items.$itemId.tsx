@@ -101,7 +101,7 @@ function ItemDetailPage() {
 
   // Find item by name (case-insensitive)
   const item = data?.items?.find(
-    (i: Item) => i.name.toLowerCase() === decodedName.toLowerCase()
+    (i: Item) => i.name.toLowerCase() === decodedName.toLowerCase(),
   )
 
   if (!item) {
@@ -235,12 +235,19 @@ function ItemDetailPage() {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {Object.entries(item.infobox)
-                .filter(([key, value]) => value != null && key !== 'image' && key !== 'special_types')
+                .filter(
+                  ([key, value]) =>
+                    value != null && key !== 'image' && key !== 'special_types',
+                )
                 .map(([key, value]) => (
                   <div key={key} className="bg-zinc-800/50 rounded-lg p-3">
-                    <div className="text-sm text-zinc-500 mb-1 capitalize">{key.replace(/_/g, ' ')}</div>
+                    <div className="text-sm text-zinc-500 mb-1 capitalize">
+                      {key.replace(/_/g, ' ')}
+                    </div>
                     <div className="text-zinc-100 font-medium">
-                      {typeof value === 'number' ? value.toLocaleString() : String(value)}
+                      {typeof value === 'number'
+                        ? value.toLocaleString()
+                        : String(value)}
                     </div>
                   </div>
                 ))}
@@ -259,7 +266,8 @@ function ItemDetailPage() {
             </h2>
             {item.crafting.workbench && (
               <p className="text-zinc-400 mb-3">
-                Workbench: <span className="text-zinc-100">{item.crafting.workbench}</span>
+                Workbench:{' '}
+                <span className="text-zinc-100">{item.crafting.workbench}</span>
               </p>
             )}
             {item.crafting.materials && item.crafting.materials.length > 0 && (
@@ -282,16 +290,6 @@ function ItemDetailPage() {
             )}
           </div>
         )}
-
-        {/* Raw data (for debugging/info) */}
-        <details className="mt-8">
-          <summary className="text-sm text-zinc-500 cursor-pointer hover:text-zinc-400 transition-colors">
-            View raw data
-          </summary>
-          <pre className="mt-4 p-4 bg-zinc-900 rounded-xl text-xs text-zinc-400 overflow-x-auto">
-            {JSON.stringify(item, null, 2)}
-          </pre>
-        </details>
       </div>
     </div>
   )

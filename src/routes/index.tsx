@@ -1,3 +1,4 @@
+import { trackEvent } from '@/components/Analytics'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Package,
@@ -16,7 +17,7 @@ export const Route = createFileRoute('/')({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: 'ARC Raiders Wiki - Your Ultimate Game Guide' },
+      { title: 'ARC Raiders DB - Your Ultimate Game Guide' },
       {
         name: 'description',
         content:
@@ -169,6 +170,9 @@ function HomePage() {
                 to="/items"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-lg transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                onClick={() => {
+                  trackEvent('BROWSER_ITEMS_CLICK')
+                }}
               >
                 <Package className="h-5 w-5" />
                 Browse Items
@@ -177,6 +181,9 @@ function HomePage() {
                 to="/events"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold rounded-lg transition-all border border-zinc-700"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                onClick={() => {
+                  trackEvent('EVENT_TIMERS_CLICK')
+                }}
               >
                 <Clock className="h-5 w-5" />
                 Event Timers

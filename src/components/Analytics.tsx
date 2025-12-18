@@ -2,7 +2,7 @@ export function UmamiAnalytics() {
   return (
     <script
       defer
-      src="https://cloud.umami.is/script.js"
+      src="/umami/script"
       data-website-id="e73c9775-573b-4346-8779-7cd17e6921e9"
     />
   )
@@ -17,6 +17,7 @@ export function trackEvent(
 ) {
   if (typeof window !== 'undefined' && (window as any).umami) {
     ;(window as any).umami.track(eventName, eventData)
+    console.log('trackEvent', eventName, eventData)
   }
 }
 

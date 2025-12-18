@@ -79,7 +79,7 @@ function EventCard({ event }: { event: EventTimer }) {
       <div className="flex items-start gap-4">
         {/* Event icon */}
         <div
-          className={`flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
+          className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden ${
             isActive ? 'ring-2 ring-emerald-500/50' : ''
           }`}
         >

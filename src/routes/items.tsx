@@ -213,7 +213,8 @@ function Pagination({
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-zinc-800">
       {/* Info */}
       <div className="text-sm text-zinc-500">
-        Page {currentPage} of {totalPages} • {total.toLocaleString()} total items
+        Page {currentPage} of {totalPages} • {total.toLocaleString()} total
+        items
       </div>
 
       {/* Navigation */}
@@ -258,7 +259,7 @@ function Pagination({
               >
                 {page}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -313,14 +314,7 @@ function ItemsPage() {
   const pagination = data?.pagination
 
   // Static list of known rarities in ARC Raiders
-  const rarities = [
-    'Common',
-    'Uncommon',
-    'Rare',
-    'Epic',
-    'Legendary',
-    'Exotic',
-  ]
+  const rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Exotic']
 
   // Check if any filters are active
   const hasActiveFilters = searchInput || selectedRarity
@@ -514,7 +508,7 @@ function ItemsPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {items.map((item) => (
-                <ItemCard key={item.id} item={item} />
+                <ItemCard key={item.name} item={item} />
               ))}
             </div>
 
