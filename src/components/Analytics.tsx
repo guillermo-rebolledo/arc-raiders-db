@@ -17,7 +17,6 @@ export function trackEvent(
 ) {
   if (typeof window !== 'undefined' && (window as any).umami) {
     ;(window as any).umami.track(eventName, eventData)
-    console.log('trackEvent', eventName, eventData)
   }
 }
 
