@@ -1,4 +1,9 @@
 export function UmamiAnalytics() {
+  // Only enable analytics in production
+  if (!import.meta.env.PROD) {
+    return null
+  }
+
   return (
     <script
       defer
@@ -15,6 +20,11 @@ export function trackEvent(
   eventName: string,
   eventData?: Record<string, string | number>,
 ) {
+  // Only track in production
+  if (!import.meta.env.PROD) {
+    return
+  }
+
   if (typeof window !== 'undefined' && (window as any).umami) {
     ;(window as any).umami.track(eventName, eventData)
   }
@@ -24,6 +34,11 @@ export function trackEvent(
  * Track page views manually
  */
 export function trackPageView(url?: string) {
+  // Only track in production
+  if (!import.meta.env.PROD) {
+    return
+  }
+
   if (typeof window !== 'undefined' && (window as any).umami) {
     ;(window as any).umami.track((props: any) => ({
       ...props,
