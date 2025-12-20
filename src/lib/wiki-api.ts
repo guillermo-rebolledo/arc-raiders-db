@@ -30,6 +30,8 @@ export interface Item {
     image?: string
     rarity?: string
     quote?: string
+    weaponquote?: string
+    attachquote?: string
     type?: string
     location?: string
     weight?: number
@@ -41,12 +43,16 @@ export interface Item {
     duration?: string
     radius?: string | null
     special_types?: string[]
+    compatible_weapons?: string[]
+    functions?: string[]
   }
   sources?: string[]
   crafting?: Array<{
     recipe?: Array<{ quantity?: number; item: string }>
     workshop?: string
     output_quantity?: number
+    result_level?: string
+    blueprint_locked?: boolean
   }>
   recycling?: {
     recycling?: Array<{ materials: Array<{ quantity: number; item: string }> }>

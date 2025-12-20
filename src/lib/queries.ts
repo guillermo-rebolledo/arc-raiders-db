@@ -10,12 +10,16 @@ import {
 import { queryKeys } from './query-client'
 import {
   fetchItems,
+  fetchItemByName,
   fetchQuests,
   fetchTraders,
   fetchEventTimers,
   fetchArcs,
 } from './server-api'
-import type { Quest, PaginationInfo as MetaforgePaginationInfo } from './metaforge-api'
+import type {
+  Quest,
+  PaginationInfo as MetaforgePaginationInfo,
+} from './metaforge-api'
 
 // Pagination info type
 interface PaginationInfo {
@@ -119,6 +123,25 @@ export function useItemsSuspense(filters: ItemFilters = {}) {
       }
       return result
     },
+  })
+}
+
+/**
+ * Hook to fetch a single item by name
+ */
+export function useItemByName(itemName: string) {
+  return useQuery({
+    queryKey: ['arc-raiders', 'items', 'by-name', itemName],
+    queryFn: async () => {
+      const result = await fetchItemByName({
+        data: { name: itemName },
+      })
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch item')
+      }
+      return result
+    },
+    enabled: !!itemName, // Only run if itemName is provided
   })
 }
 

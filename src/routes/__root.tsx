@@ -2,11 +2,13 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  Link,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { FileQuestion, Home } from 'lucide-react'
 import { Layout } from '../components/Layout'
 import { UmamiAnalytics } from '../components/Analytics'
 
@@ -81,6 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     component: RootComponent,
     shellComponent: RootDocument,
+    notFoundComponent: NotFoundComponent,
   },
 )
 
@@ -118,5 +121,32 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function NotFoundComponent() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center py-20 px-4">
+      <div className="relative">
+        <div className="absolute inset-0 bg-zinc-500/20 blur-xl rounded-full" />
+        <FileQuestion className="relative h-16 w-16 text-zinc-500" />
+      </div>
+      <h1
+        className="text-4xl font-bold text-zinc-100 mt-6 mb-2"
+        style={{ fontFamily: 'Rajdhani, sans-serif' }}
+      >
+        404 - Page Not Found
+      </h1>
+      <p className="text-zinc-400 mb-8 text-center max-w-md">
+        The page you're looking for doesn't exist or has been moved.
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-900 font-bold rounded-lg transition-all"
+      >
+        <Home className="h-4 w-4" />
+        Go Home
+      </Link>
+    </div>
   )
 }

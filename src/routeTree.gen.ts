@@ -15,6 +15,7 @@ import { Route as ItemsRouteImport } from './routes/items'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ArcsRouteImport } from './routes/arcs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ItemsIndexRouteImport } from './routes/items.index'
 import { Route as UmamiScriptRouteImport } from './routes/umami/script'
 import { Route as ItemsItemIdRouteImport } from './routes/items.$itemId'
 import { Route as UmamiApiSplatRouteImport } from './routes/umami/api/$'
@@ -49,6 +50,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ItemsIndexRoute = ItemsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ItemsRoute,
+} as any)
 const UmamiScriptRoute = UmamiScriptRouteImport.update({
   id: '/umami/script',
   path: '/umami/script',
@@ -74,17 +80,18 @@ export interface FileRoutesByFullPath {
   '/traders': typeof TradersRoute
   '/items/$itemId': typeof ItemsItemIdRoute
   '/umami/script': typeof UmamiScriptRoute
+  '/items/': typeof ItemsIndexRoute
   '/umami/api/$': typeof UmamiApiSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arcs': typeof ArcsRoute
   '/events': typeof EventsRoute
-  '/items': typeof ItemsRouteWithChildren
   '/quests': typeof QuestsRoute
   '/traders': typeof TradersRoute
   '/items/$itemId': typeof ItemsItemIdRoute
   '/umami/script': typeof UmamiScriptRoute
+  '/items': typeof ItemsIndexRoute
   '/umami/api/$': typeof UmamiApiSplatRoute
 }
 export interface FileRoutesById {
@@ -97,6 +104,7 @@ export interface FileRoutesById {
   '/traders': typeof TradersRoute
   '/items/$itemId': typeof ItemsItemIdRoute
   '/umami/script': typeof UmamiScriptRoute
+  '/items/': typeof ItemsIndexRoute
   '/umami/api/$': typeof UmamiApiSplatRoute
 }
 export interface FileRouteTypes {
@@ -110,17 +118,18 @@ export interface FileRouteTypes {
     | '/traders'
     | '/items/$itemId'
     | '/umami/script'
+    | '/items/'
     | '/umami/api/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/arcs'
     | '/events'
-    | '/items'
     | '/quests'
     | '/traders'
     | '/items/$itemId'
     | '/umami/script'
+    | '/items'
     | '/umami/api/$'
   id:
     | '__root__'
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/traders'
     | '/items/$itemId'
     | '/umami/script'
+    | '/items/'
     | '/umami/api/$'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/items/': {
+      id: '/items/'
+      path: '/'
+      fullPath: '/items/'
+      preLoaderRoute: typeof ItemsIndexRouteImport
+      parentRoute: typeof ItemsRoute
+    }
     '/umami/script': {
       id: '/umami/script'
       path: '/umami/script'
@@ -216,10 +233,12 @@ declare module '@tanstack/react-router' {
 
 interface ItemsRouteChildren {
   ItemsItemIdRoute: typeof ItemsItemIdRoute
+  ItemsIndexRoute: typeof ItemsIndexRoute
 }
 
 const ItemsRouteChildren: ItemsRouteChildren = {
   ItemsItemIdRoute: ItemsItemIdRoute,
+  ItemsIndexRoute: ItemsIndexRoute,
 }
 
 const ItemsRouteWithChildren = ItemsRoute._addFileChildren(ItemsRouteChildren)

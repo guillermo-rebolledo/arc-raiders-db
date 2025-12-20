@@ -38,6 +38,44 @@ function getItemRarity(item: Item): string | undefined {
   return item.infobox?.rarity
 }
 
+// Server function to fetch a single item by name
+export const fetchItemByName = createServerFn({ method: 'GET' })
+  .inputValidator((params: { name: string }) => params)
+  .handler(async ({ data }) => {
+    try {
+      const result = await getItems()
+      const items = ensureArray<Item>(result.data)
+      const decodedName = decodeURIComponent(data.name)
+
+      // Find item by exact name match (case-insensitive)
+      const item = items.find(
+        (i) => i.name.toLowerCase() === decodedName.toLowerCase(),
+      )
+
+      if (!item) {
+        return {
+          success: false as const,
+          error: `Item "${decodedName}" not found`,
+          item: null as Item | null,
+        }
+      }
+
+      return {
+        success: true as const,
+        item,
+        fromCache: result.fromCache,
+        cachedAt: result.cachedAt,
+      }
+    } catch (error) {
+      console.error('Error fetching item:', error)
+      return {
+        success: false as const,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        item: null as Item | null,
+      }
+    }
+  })
+
 // Server function to fetch items (with client-side filtering/pagination)
 export const fetchItems = createServerFn({ method: 'GET' })
   .inputValidator(

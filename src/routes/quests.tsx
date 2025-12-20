@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Search,
   ScrollText,
@@ -326,30 +326,34 @@ function Pagination({
   )
 }
 
-// Custom hook for debouncing
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
-
 function QuestsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [questsPerPage, setQuestsPerPage] = useState(25)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Debounce search input to avoid too many API calls
-  const debouncedSearch = useDebounce(searchInput, 300)
+  // Debounce search input - only triggers when user stops typing
+  // This ensures the input is never interrupted and search only happens when typing is complete
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  useEffect(() => {
+    // Clear any existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+
+    // Set a new timeout - only update debouncedSearch after user stops typing
+    typingTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(searchInput)
+    }, 800)
+
+    // Cleanup on unmount or when searchInput changes
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [searchInput])
 
   // Reset to page 1 when search changes
   useEffect(() => {
