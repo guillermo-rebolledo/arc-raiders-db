@@ -13,6 +13,7 @@ import { Route as TradersRouteImport } from './routes/traders'
 import { Route as QuestsRouteImport } from './routes/quests'
 import { Route as ItemsRouteImport } from './routes/items'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as DevRouteImport } from './routes/dev'
 import { Route as ArcsRouteImport } from './routes/arcs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ItemsIndexRouteImport } from './routes/items.index'
@@ -38,6 +39,11 @@ const ItemsRoute = ItemsRouteImport.update({
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevRoute = DevRouteImport.update({
+  id: '/dev',
+  path: '/dev',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArcsRoute = ArcsRouteImport.update({
@@ -74,6 +80,7 @@ const UmamiApiSplatRoute = UmamiApiSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arcs': typeof ArcsRoute
+  '/dev': typeof DevRoute
   '/events': typeof EventsRoute
   '/items': typeof ItemsRouteWithChildren
   '/quests': typeof QuestsRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arcs': typeof ArcsRoute
+  '/dev': typeof DevRoute
   '/events': typeof EventsRoute
   '/quests': typeof QuestsRoute
   '/traders': typeof TradersRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/arcs': typeof ArcsRoute
+  '/dev': typeof DevRoute
   '/events': typeof EventsRoute
   '/items': typeof ItemsRouteWithChildren
   '/quests': typeof QuestsRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/arcs'
+    | '/dev'
     | '/events'
     | '/items'
     | '/quests'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/arcs'
+    | '/dev'
     | '/events'
     | '/quests'
     | '/traders'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/arcs'
+    | '/dev'
     | '/events'
     | '/items'
     | '/quests'
@@ -148,6 +160,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArcsRoute: typeof ArcsRoute
+  DevRoute: typeof DevRoute
   EventsRoute: typeof EventsRoute
   ItemsRoute: typeof ItemsRouteWithChildren
   QuestsRoute: typeof QuestsRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev': {
+      id: '/dev'
+      path: '/dev'
+      fullPath: '/dev'
+      preLoaderRoute: typeof DevRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/arcs': {
@@ -246,6 +266,7 @@ const ItemsRouteWithChildren = ItemsRoute._addFileChildren(ItemsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArcsRoute: ArcsRoute,
+  DevRoute: DevRoute,
   EventsRoute: EventsRoute,
   ItemsRoute: ItemsRouteWithChildren,
   QuestsRoute: QuestsRoute,

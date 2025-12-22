@@ -19,6 +19,8 @@ import {
   CacheIndicator,
 } from '../components/LoadingStates'
 import { getRarityColor } from '../lib/rarity-constants'
+import { HoverCard, HoverCardTrigger } from '@/components/ui/hover-card'
+import { ItemHoverCardContent } from '../components/ItemHoverCard'
 
 // Pagination info type
 interface PaginationInfo {
@@ -71,62 +73,68 @@ function ItemCard({ item }: { item: Item }) {
   const categoryStyle = categoryStyles[category] || categoryStyles.default
   const rarityStyle = getRarityColor(rarity)
   const itemIcon = item.image_urls?.thumb || item.image_urls?.original
+  const infobox = item.infobox
 
   return (
-    <Link
-      to="/items/$itemId"
-      params={{ itemId: encodeURIComponent(item.name) }}
-      className={`group relative overflow-hidden rounded-xl bg-linear-to-br ${categoryStyle} border p-4 transition-all hover:scale-[1.02] hover:shadow-lg`}
-    >
-      <div className="flex items-start gap-4">
-        {/* Item icon */}
-        <div className="shrink-0 w-16 h-16 rounded-lg bg-zinc-900/50 flex items-center justify-center overflow-hidden">
-          {itemIcon ? (
-            <img
-              src={itemIcon}
-              alt={item.name}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-contain"
-            />
-          ) : (
-            <Package className="h-8 w-8 text-zinc-600" />
-          )}
-        </div>
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <Link
+          to="/items/$itemId"
+          params={{ itemId: encodeURIComponent(item.name) }}
+          className={`group relative overflow-hidden rounded-xl bg-linear-to-br ${categoryStyle} border p-4 transition-all hover:scale-[1.02] hover:shadow-lg`}
+        >
+          <div className="flex items-start gap-4">
+            {/* Item icon */}
+            <div className="shrink-0 w-16 h-16 rounded-lg bg-zinc-900/50 flex items-center justify-center overflow-hidden">
+              {itemIcon ? (
+                <img
+                  src={itemIcon}
+                  alt={item.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <Package className="h-8 w-8 text-zinc-600" />
+              )}
+            </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <h3
-              className="font-bold text-zinc-100 truncate"
-              style={{ fontFamily: 'Rajdhani, sans-serif' }}
-            >
-              {item.name}
-            </h3>
-            <ChevronRight className="h-4 w-4 text-zinc-500 group-hover:text-zinc-300 group-hover:translate-x-1 transition-all flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <h3
+                  className="font-bold text-zinc-100 truncate"
+                  style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                >
+                  {item.name}
+                </h3>
+                <ChevronRight className="h-4 w-4 text-zinc-500 group-hover:text-zinc-300 group-hover:translate-x-1 transition-all shrink-0" />
+              </div>
+
+              {/* Rarity badge */}
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border mt-1 ${rarityStyle}`}
+              >
+                {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+              </span>
+
+              {/* Description preview */}
+              {infobox?.quote && (
+                <p className="text-xs text-zinc-400 mt-2 line-clamp-2 italic">
+                  {infobox.quote}
+                </p>
+              )}
+
+              {/* Meta info */}
+              <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
+                {infobox?.type && <span>{infobox.type}</span>}
+                {infobox?.weight && <span>{infobox.weight}kg</span>}
+              </div>
+            </div>
           </div>
-
-          {/* Rarity badge */}
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border mt-1 ${rarityStyle}`}
-          >
-            {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-          </span>
-
-          {/* Description preview */}
-          {item.infobox?.quote && (
-            <p className="text-xs text-zinc-400 mt-2 line-clamp-2 italic">
-              {item.infobox.quote}
-            </p>
-          )}
-
-          {/* Meta info */}
-          <div className="flex items-center gap-3 mt-2 text-xs text-zinc-500">
-            {item.infobox?.type && <span>{item.infobox.type}</span>}
-            {item.infobox?.weight && <span>{item.infobox.weight}kg</span>}
-          </div>
-        </div>
-      </div>
-    </Link>
+        </Link>
+      </HoverCardTrigger>
+      <ItemHoverCardContent item={item} />
+    </HoverCard>
   )
 }
 
