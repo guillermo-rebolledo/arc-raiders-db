@@ -12,6 +12,13 @@ import {
 } from 'lucide-react'
 import { useItems } from '../lib/queries'
 import type { Item } from '../lib/wiki-api'
+import {
+  ErrorDisplay,
+  ItemsGridSkeleton,
+  EmptyState,
+  CacheIndicator,
+} from '../components/LoadingStates'
+import { getRarityColor } from '../lib/rarity-constants'
 
 // Pagination info type
 interface PaginationInfo {
@@ -22,12 +29,6 @@ interface PaginationInfo {
   hasNextPage: boolean
   hasPrevPage: boolean
 }
-import {
-  ErrorDisplay,
-  ItemsGridSkeleton,
-  EmptyState,
-  CacheIndicator,
-} from '../components/LoadingStates'
 
 export const Route = createFileRoute('/items/')({
   component: ItemsPage,
@@ -49,16 +50,6 @@ export const Route = createFileRoute('/items/')({
   }),
 })
 
-// Rarity colors
-const rarityColors: Record<string, string> = {
-  common: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
-  uncommon: 'bg-green-500/20 text-green-300 border-green-500/30',
-  rare: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  epic: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  legendary: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-  exotic: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-}
-
 // Category icons/colors
 const categoryStyles: Record<string, string> = {
   weapon: 'from-red-500/20 to-orange-500/20 border-red-500/30',
@@ -78,7 +69,7 @@ function ItemCard({ item }: { item: Item }) {
   const rarity = getItemRarity(item).toLowerCase()
   const category = (item.infobox?.type || 'default').toLowerCase()
   const categoryStyle = categoryStyles[category] || categoryStyles.default
-  const rarityStyle = rarityColors[rarity] || rarityColors.common
+  const rarityStyle = getRarityColor(rarity)
   const itemIcon = item.image_urls?.thumb || item.image_urls?.original
 
   return (

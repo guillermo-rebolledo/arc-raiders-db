@@ -22,13 +22,13 @@ export const Route = createFileRoute('/traders')({
   component: TradersPage,
   head: () => ({
     meta: [
-      { title: 'Traders & Shops - ARC Raiders Wiki' },
+      { title: 'Traders & Shops - ARC Raiders DB' },
       {
         name: 'description',
         content:
           'Browse all traders and their inventories in ARC Raiders. Find items for sale, prices, and stock information.',
       },
-      { property: 'og:title', content: 'Traders & Shops - ARC Raiders Wiki' },
+      { property: 'og:title', content: 'Traders & Shops - ARC Raiders DB' },
       {
         property: 'og:description',
         content: 'Browse all traders and their inventories in ARC Raiders.',
@@ -211,7 +211,7 @@ function TraderCard({ trader }: { trader: Trader }) {
               rel="noopener noreferrer"
               className="inline-block mt-4 text-sm text-purple-400 hover:text-purple-300 hover:underline"
             >
-              View on Wiki →
+              View on DB →
             </a>
           )}
         </div>
@@ -271,7 +271,7 @@ function TradersPage() {
 
   // Filter traders
   const filteredTraders = traders.filter((trader) =>
-    trader.name.toLowerCase().includes(searchQuery.toLowerCase())
+    trader.name.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   // Calculate totals

@@ -44,7 +44,7 @@ export function Layout() {
                   ARC RAIDERS
                 </span>
                 <span className="text-[10px] font-medium tracking-widest text-zinc-500 uppercase">
-                  Community Wiki
+                  Community DB
                 </span>
               </div>
             </Link>

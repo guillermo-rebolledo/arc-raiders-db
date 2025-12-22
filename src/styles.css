@@ -1,18 +1,28 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Base styles */
 body {
   @apply m-0 bg-zinc-950 text-zinc-100;
-  font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family:
+    'Rajdhani',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Custom scrollbar */
@@ -68,7 +78,8 @@ html {
 
 /* Animation for pulse effect */
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
   }
   50% {
@@ -78,4 +89,97 @@ html {
 
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* LootReveal component animations */
+@keyframes revealSwipe {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes rotateBorder {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 400% 0%;
+  }
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* LootReveal component styles */
+.loot-border {
+  background: linear-gradient(45deg, #8480aa, #6eb1bf, #f9f8fa, #8480aa);
+  background-size: 400% 400%;
+  box-shadow:
+    inset 0 0 20px rgba(var(--rarity-rgb), 0.5),
+    0 0 30px rgba(var(--rarity-rgb), 0.5);
+  border-radius: 0.75rem;
+  padding: 3px;
+  z-index: 20;
+}
+
+.loot-border-inner {
+  border-radius: calc(0.75rem - 3px);
+  position: relative;
+  overflow: hidden;
+}
+
+.loot-reveal-mask {
+  background: linear-gradient(
+    90deg,
+    rgb(51, 65, 85) 0%,
+    rgb(51, 65, 85) 70%,
+    rgba(132, 128, 170, 0.3) 72%,
+    rgba(132, 128, 170, 0.6) 75%,
+    #8480aa 78%,
+    #6eb1bf 85%,
+    #f9f8fa 100%
+  );
+  border-radius: calc(0.75rem - 3px);
+  z-index: 0;
+}
+
+.loot-reveal-mask.revealing {
+  animation: revealSwipe 0.8s ease-out forwards;
+}
+
+.loot-content {
+  animation-fill-mode: both;
+  position: relative;
+  z-index: 5;
+  opacity: 0;
+}
+
+.loot-content.revealed {
+  animation: contentFadeIn 0.5s ease-out;
+  opacity: 1;
+}
+
+.loot-item-name {
+  text-shadow: 0 0 20px rgba(var(--rarity-rgb), 0.5);
+}
+
+.loot-border.animating {
+  animation: rotateBorder 1.2s linear infinite;
+}
+
+.loot-reveal-mask.revealing {
+  animation: revealSwipe 0.8s ease-out forwards;
+}
+
+.loot-content.revealed {
+  animation: contentFadeIn 0.5s ease-out;
 }

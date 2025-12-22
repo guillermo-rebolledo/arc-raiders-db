@@ -21,16 +21,16 @@ export const Route = createFileRoute('/')({
       {
         name: 'description',
         content:
-          'The ultimate community-driven wiki for ARC Raiders. Find items, quests, traders, ARCs, and live event timers. Your complete guide to surviving the ARC.',
+          'The ultimate community-driven database for ARC Raiders. Find items, quests, traders, ARCs, and live event timers. Your complete guide to surviving the ARC.',
       },
       {
         property: 'og:title',
-        content: 'ARC Raiders Wiki - Your Ultimate Game Guide',
+        content: 'ARC Raiders DB - Your Ultimate Game Guide',
       },
       {
         property: 'og:description',
         content:
-          'The ultimate community-driven wiki for ARC Raiders. Your complete guide to surviving the ARC.',
+          'The ultimate community-driven database for ARC Raiders. Your complete guide to surviving the ARC.',
       },
     ],
   }),
@@ -137,7 +137,7 @@ function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
               </span>
-              Community Wiki
+              Community DB
             </div>
 
             {/* Title */}

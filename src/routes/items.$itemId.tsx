@@ -20,29 +20,97 @@ import {
 } from 'lucide-react'
 import { useItemByName } from '../lib/queries'
 import { ErrorDisplay, Skeleton } from '../components/LoadingStates'
+import { getRarityColor } from '../lib/rarity-constants'
+import { LootReveal } from '@/components/LootReveal'
+import { fetchItemByName } from '../lib/server-api'
 
 export const Route = createFileRoute('/items/$itemId')({
+  loader: async ({ params }) => {
+    const itemId = params.itemId
+    const result = await fetchItemByName({ data: { name: itemId } })
+    return result
+  },
   component: ItemDetailPage,
-})
+  head: ({ loaderData, params }) => {
+    // Try to get item from loader data first
+    let item = loaderData?.success ? loaderData.item : null
+    // Fallback to decoded item name from params if loader data isn't available
+    const decodedName = decodeURIComponent(params.itemId)
+    const itemName = item?.name || decodedName || 'Item'
 
-// Rarity colors
-const rarityColors: Record<string, string> = {
-  common: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
-  uncommon: 'bg-green-500/20 text-green-300 border-green-500/30',
-  rare: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  epic: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  legendary: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-  exotic: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-}
+    const description =
+      item?.infobox?.quote ||
+      item?.infobox?.weaponquote ||
+      item?.infobox?.attachquote ||
+      `View details for ${itemName} in ARC Raiders. Find stats, crafting recipes, sources, and more.`
+    const itemImage =
+      item?.image_urls?.thumb || item?.image_urls?.original || undefined
+
+    return {
+      meta: [
+        { title: `${itemName} - ARC Raiders DB` },
+        {
+          name: 'description',
+          content: description,
+        },
+        {
+          property: 'og:title',
+          content: `${itemName} - ARC Raiders DB`,
+        },
+        {
+          property: 'og:description',
+          content: description,
+        },
+        {
+          property: 'og:type',
+          content: 'article',
+        },
+        ...(itemImage
+          ? [
+              {
+                property: 'og:image',
+                content: itemImage,
+              },
+            ]
+          : []),
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+        {
+          name: 'twitter:title',
+          content: `${itemName} - ARC Raiders DB`,
+        },
+        {
+          name: 'twitter:description',
+          content: description,
+        },
+        ...(itemImage
+          ? [
+              {
+                name: 'twitter:image',
+                content: itemImage,
+              },
+            ]
+          : []),
+      ],
+    }
+  },
+})
 
 function ItemDetailPage() {
   const { itemId } = Route.useParams()
   const decodedName = decodeURIComponent(itemId)
-
-  // Fetch the item by name using TanStack Query
+  const loaderData = Route.useLoaderData()
+  // Use loader data if available, otherwise fall back to query
   const { data, isLoading, isError, error } = useItemByName(itemId)
 
-  if (isLoading) {
+  // Prefer loader data if available (for SSR/initial load)
+  const itemData = loaderData?.success ? loaderData : data
+  const hasLoaderData = loaderData && loaderData.success
+
+  // Show loading only if we don't have loader data and query is loading
+  if (isLoading && !hasLoaderData) {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="mx-auto max-w-4xl">
@@ -52,7 +120,8 @@ function ItemDetailPage() {
     )
   }
 
-  if (isError || !data?.success || !data.item) {
+  // Only show error if we don't have loader data AND query failed
+  if (!hasLoaderData && (isError || !itemData?.success || !itemData.item)) {
     return (
       <div className="min-h-screen py-8 px-4">
         <div className="mx-auto max-w-4xl">
@@ -75,11 +144,22 @@ function ItemDetailPage() {
     )
   }
 
-  const item = data.item
+  // Ensure itemData exists and has an item before proceeding
+  if (!itemData || !itemData.success || !itemData.item) {
+    return (
+      <div className="min-h-screen py-8 px-4">
+        <div className="mx-auto max-w-4xl">
+          <Skeleton />
+        </div>
+      </div>
+    )
+  }
+
+  const item = itemData.item
   const itemIcon = item.image_urls?.thumb || item.image_urls?.original
   const infobox = item.infobox
   const rarity = infobox?.rarity?.toLowerCase() || 'common'
-  const rarityStyle = rarityColors[rarity] || rarityColors.common
+  const rarityStyle = getRarityColor(rarity)
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -95,15 +175,9 @@ function ItemDetailPage() {
         <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 space-y-6">
           {/* Header with icon and name */}
           <div className="flex items-start gap-4">
-            <div className="shrink-0 w-20 h-20 rounded-lg bg-zinc-900/50 flex items-center justify-center overflow-hidden border border-zinc-800">
+            <div className="shrink-0 rounded-lg bg-zinc-900/50 flex items-center justify-center overflow-hidden border border-zinc-800">
               {itemIcon ? (
-                <img
-                  src={itemIcon}
-                  alt={item.name}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-contain"
-                />
+                <LootReveal item={item} />
               ) : (
                 <Package className="h-10 w-10 text-zinc-600" />
               )}

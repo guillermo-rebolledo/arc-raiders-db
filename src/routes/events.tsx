@@ -22,13 +22,13 @@ export const Route = createFileRoute('/events')({
   component: EventsPage,
   head: () => ({
     meta: [
-      { title: 'Event Timers - ARC Raiders Wiki' },
+      { title: 'Event Timers - ARC Raiders DB' },
       {
         name: 'description',
         content:
           'Live event timers for ARC Raiders. Track active and upcoming events like Harvester, Matriarch, Night Raid, and more across all maps.',
       },
-      { property: 'og:title', content: 'Event Timers - ARC Raiders Wiki' },
+      { property: 'og:title', content: 'Event Timers - ARC Raiders DB' },
       {
         property: 'og:description',
         content:

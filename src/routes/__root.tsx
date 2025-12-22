@@ -21,41 +21,41 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { title: 'ARC Raiders Wiki - Community Database' },
+        { title: 'ARC Raiders DB - Community Database' },
         {
           name: 'description',
           content:
-            'Community-driven wiki and database for ARC Raiders. Find items, quests, traders, ARCs, and live event timers. Your ultimate guide to surviving the ARC.',
+            'Community-driven database for ARC Raiders. Find items, quests, traders, ARCs, and live event timers. Your ultimate guide to surviving the ARC.',
         },
         // SEO keywords
         {
           name: 'keywords',
           content:
-            'ARC Raiders, wiki, database, items, quests, traders, events, guide, game wiki, ARCs, loot',
+            'ARC Raiders, database, DB, items, quests, traders, events, guide, game database, ARCs, loot',
         },
         // Open Graph (Facebook, Discord, etc.)
         { property: 'og:type', content: 'website' },
-        { property: 'og:site_name', content: 'ARC Raiders Wiki' },
+        { property: 'og:site_name', content: 'ARC Raiders DB' },
         {
           property: 'og:title',
-          content: 'ARC Raiders Wiki - Community Database',
+          content: 'ARC Raiders DB - Community Database',
         },
         {
           property: 'og:description',
           content:
-            'Community-driven wiki and database for ARC Raiders. Find items, quests, traders, and event timers.',
+            'Community-driven database for ARC Raiders. Find items, quests, traders, and event timers.',
         },
         { property: 'og:locale', content: 'en_US' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         {
           name: 'twitter:title',
-          content: 'ARC Raiders Wiki - Community Database',
+          content: 'ARC Raiders DB - Community Database',
         },
         {
           name: 'twitter:description',
           content:
-            'Community-driven wiki and database for ARC Raiders. Find items, quests, traders, and event timers.',
+            'Community-driven database for ARC Raiders. Find items, quests, traders, and event timers.',
         },
         // Additional SEO
         { name: 'robots', content: 'index, follow' },

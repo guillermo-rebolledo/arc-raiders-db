@@ -35,13 +35,13 @@ export const Route = createFileRoute('/quests')({
   component: QuestsPage,
   head: () => ({
     meta: [
-      { title: 'Quests Guide - ARC Raiders Wiki' },
+      { title: 'Quests Guide - ARC Raiders DB' },
       {
         name: 'description',
         content:
           'Complete guide to all quests in ARC Raiders. Find objectives, required items, and rewards for every quest.',
       },
-      { property: 'og:title', content: 'Quests Guide - ARC Raiders Wiki' },
+      { property: 'og:title', content: 'Quests Guide - ARC Raiders DB' },
       {
         property: 'og:description',
         content:

@@ -15,13 +15,13 @@ export const Route = createFileRoute('/arcs')({
   component: ArcsPage,
   head: () => ({
     meta: [
-      { title: 'ARCs & Missions - ARC Raiders Wiki' },
+      { title: 'ARCs & Missions - ARC Raiders DB' },
       {
         name: 'description',
         content:
           'Complete guide to all ARCs and missions in ARC Raiders. Find loot tables, rewards, and strategies for each mission.',
       },
-      { property: 'og:title', content: 'ARCs & Missions - ARC Raiders Wiki' },
+      { property: 'og:title', content: 'ARCs & Missions - ARC Raiders DB' },
       {
         property: 'og:description',
         content:
